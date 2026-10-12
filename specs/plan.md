@@ -57,6 +57,7 @@ Fluxo de uma requisição: **Endpoint → ILivroService → entidade (regras) �
 | D-18 | Testes de integração com `WebApplicationFactory<Program>` (pacote `Microsoft.AspNetCore.Mvc.Testing`), cada teste com um banco SQLite em memória próprio | Q-03 exige executar contra a aplicação real. Q-06 proíbe usar o banco do usuário, e o banco em memória isola cada teste. |
 | D-19 | Pacotes de teste: só os do template `dotnet new xunit` do SDK 10 e o de D-18. Sem biblioteca de asserções extra | S-05 e S-06: as asserções do xUnit bastam, e cada pacote a mais precisaria de justificativa. |
 | D-20 | Sem OpenAPI/Swagger. O teste manual usa o arquivo `AcervoPessoal.Api.http` | A spec não pede documentação interativa, e isso evita um pacote (S-06). |
+| D-21 | Na máquina de desenvolvimento, build, testes, migrações e execução rodam num contêiner descartável da imagem oficial `mcr.microsoft.com/dotnet/sdk:10.0`, com o repositório montado em `/repo` e os pacotes NuGet num volume (`acervo-nuget`). Não há `Dockerfile` nem `docker-compose`: o contêiner é só ambiente de execução do SDK | O Smart App Control do Windows bloqueia o carregamento das DLLs compiladas localmente, que não têm assinatura (erro `0x800711C7`). Isso impede `dotnet test`, `dotnet ef` e `dotnet run`. O contêiner Linux não é afetado e não exige desligar a proteção. A aplicação não depende do Docker: numa máquina sem esse bloqueio, os comandos `dotnet` rodam direto. |
 
 ## Modelo de dados
 
@@ -149,3 +150,4 @@ Exemplo de erro 400 (CA-02):
 | R-04 | Testes unitários do serviço usam SQLite em memória e não o banco real. | Os testes de integração exercitam o mesmo provedor (SQLite), então o comportamento é o mesmo. |
 | R-05 | O domínio do projeto (acervo) é diferente do sugerido no desafio (gerador de senhas). | Decisão do dono do projeto. O método, a stack e as regras de arquitetura e qualidade seguem o desafio. |
 | R-06 | `Database.Migrate()` na inicialização falha se o arquivo do banco estiver bloqueado. | Aceitável para uso local. O erro aparece na hora de subir a API. |
+| R-07 | Com a D-21, o contêiner (Linux) e as ferramentas do Windows (VS Code, Visual Studio) gravam nas mesmas pastas `bin/` e `obj/`. Um restore de um lado quebra a build do outro (`NETSDK1004`, caminhos de pacotes incompatíveis). | Por enquanto, apagar `bin/` e `obj/` antes de trocar de lado. Solução definitiva pendente de decisão: separar a saída de build do contêiner. |
