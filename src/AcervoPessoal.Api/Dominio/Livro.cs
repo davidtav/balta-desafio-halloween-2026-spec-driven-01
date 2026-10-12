@@ -12,6 +12,12 @@ public sealed class Livro
     public int Ano { get; private set; }
     public StatusLivro Situacao { get; private set; }
 
+    private readonly List<Emprestimo> _emprestimos = [];
+    public IReadOnlyCollection<Emprestimo> Emprestimos => _emprestimos.AsReadOnly();
+
+    // RN-09: no máximo um empréstimo em aberto por vez.
+    public Emprestimo? EmprestimoAtual => _emprestimos.SingleOrDefault(e => e.EmAberto);
+
     public Livro(string? titulo, string? autor, int? ano)
     {
         (Titulo, Autor, Ano) = ValidarDados(titulo, autor, ano);
@@ -23,6 +29,26 @@ public sealed class Livro
     public void AlterarDados(string? titulo, string? autor, int? ano)
     {
         (Titulo, Autor, Ano) = ValidarDados(titulo, autor, ano);
+    }
+
+    // RN-04: só livro disponível pode ser emprestado. RN-06/RN-12: a pessoa é validada pelo Emprestimo.
+    public void Emprestar(string? pessoa, DateTimeOffset agora)
+    {
+        if (Situacao != StatusLivro.Disponivel)
+            throw new RegraNegocioException("O livro já está emprestado.");
+
+        _emprestimos.Add(new Emprestimo(pessoa, agora));
+        Situacao = StatusLivro.Emprestado;
+    }
+
+    // RN-05: só livro emprestado pode ser devolvido. RN-09: a devolução encerra o empréstimo em aberto.
+    public void Devolver(DateTimeOffset agora)
+    {
+        if (Situacao != StatusLivro.Emprestado)
+            throw new RegraNegocioException("O livro não está emprestado.");
+
+        EmprestimoAtual!.Encerrar(agora);
+        Situacao = StatusLivro.Disponivel;
     }
 
     private static (string Titulo, string Autor, int Ano) ValidarDados(string? titulo, string? autor, int? ano)
