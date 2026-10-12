@@ -1,0 +1,21 @@
+{
+  "name": "AcervoPessoal (.NET 10)",
+  "image": "mcr.microsoft.com/dotnet/sdk:10.0",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/repo,type=bind",
+  "workspaceFolder": "/repo",
+  "containerEnv": {
+    "DOTNET_RUNNING_IN_CONTAINER": "true"
+  },
+  "mounts": [
+    "source=acervo-nuget,target=/root/.nuget/packages,type=volume"
+  ],
+  "postCreateCommand": "git config --global --add safe.directory /repo && dotnet tool restore && dotnet restore AcervoPessoal.slnx",
+  "forwardPorts": [5102],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csdevkit"
+      ]
+    }
+  }
+}

@@ -485,3 +485,7 @@ $RECYCLE.BIN/
 *.db
 *.db-shm
 *.db-wal
+
+# Saída de build dentro do contêiner (D-22)
+bin-container/
+obj-container/

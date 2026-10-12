@@ -1,0 +1,18 @@
+<Project>
+
+  <!--
+    D-22: dentro do contêiner (docker run ou Dev Container) a build grava em bin-container/ e obj-container/,
+    para não disputar bin/ e obj/ com o VS Code e o Visual Studio no Windows (R-07).
+    As imagens oficiais do SDK já definem DOTNET_RUNNING_IN_CONTAINER=true.
+  -->
+  <PropertyGroup Condition="'$(DOTNET_RUNNING_IN_CONTAINER)' == 'true'">
+    <BaseIntermediateOutputPath>$(MSBuildProjectDirectory)/obj-container/</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(MSBuildProjectDirectory)/bin-container/</BaseOutputPath>
+  </PropertyGroup>
+
+  <!-- Cada lado ignora a saída do outro, senão os .cs gerados em obj/ seriam compilados de novo. -->
+  <PropertyGroup>
+    <DefaultItemExcludes>$(DefaultItemExcludes);bin/**;obj/**;bin-container/**;obj-container/**</DefaultItemExcludes>
+  </PropertyGroup>
+
+</Project>
