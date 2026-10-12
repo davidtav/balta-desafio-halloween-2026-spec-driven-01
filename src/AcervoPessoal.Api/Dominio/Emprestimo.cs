@@ -12,6 +12,9 @@ public sealed class Emprestimo
 
     public bool EmAberto => DataDevolucao is null;
 
+    // Usado pelo EF Core ao materializar do banco.
+    private Emprestimo() => Pessoa = string.Empty;
+
     // Só o Livro cria e encerra empréstimos (D-09).
     internal Emprestimo(string? pessoa, DateTimeOffset dataEmprestimo)
     {

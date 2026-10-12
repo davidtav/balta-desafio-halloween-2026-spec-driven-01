@@ -20,6 +20,13 @@ public sealed class Livro
     // RN-09: no máximo um empréstimo em aberto por vez.
     public Emprestimo? EmprestimoAtual => _emprestimos.SingleOrDefault(e => e.EmAberto);
 
+    // Usado pelo EF Core ao materializar do banco.
+    private Livro()
+    {
+        Titulo = string.Empty;
+        Autor = string.Empty;
+    }
+
     public Livro(string? titulo, string? autor, int? ano)
     {
         (Titulo, Autor, Ano) = ValidarDados(titulo, autor, ano);
