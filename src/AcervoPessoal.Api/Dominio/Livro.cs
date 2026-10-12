@@ -11,6 +11,8 @@ public sealed class Livro
     public string Autor { get; private set; }
     public int Ano { get; private set; }
     public StatusLivro Situacao { get; private set; }
+    public bool Removido { get; private set; }
+    public DateTimeOffset? RemovidoEm { get; private set; }
 
     private readonly List<Emprestimo> _emprestimos = [];
     public IReadOnlyCollection<Emprestimo> Emprestimos => _emprestimos.AsReadOnly();
@@ -49,6 +51,17 @@ public sealed class Livro
 
         EmprestimoAtual!.Encerrar(agora);
         Situacao = StatusLivro.Disponivel;
+    }
+
+    // RF-06: remoção lógica, os dados e os empréstimos continuam guardados.
+    // RN-11: livro emprestado precisa ser devolvido antes.
+    public void Remover(DateTimeOffset agora)
+    {
+        if (Situacao == StatusLivro.Emprestado)
+            throw new RegraNegocioException("O livro está emprestado e precisa ser devolvido antes de ser removido.");
+
+        Removido = true;
+        RemovidoEm = agora;
     }
 
     private static (string Titulo, string Autor, int Ano) ValidarDados(string? titulo, string? autor, int? ano)
