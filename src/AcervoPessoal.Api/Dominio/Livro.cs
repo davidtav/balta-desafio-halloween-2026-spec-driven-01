@@ -18,6 +18,13 @@ public sealed class Livro
         Situacao = StatusLivro.Disponivel;
     }
 
+    // RN-08: alterar dados não muda a situação. Tudo é validado antes de atribuir,
+    // então uma alteração inválida não deixa o livro pela metade.
+    public void AlterarDados(string? titulo, string? autor, int? ano)
+    {
+        (Titulo, Autor, Ano) = ValidarDados(titulo, autor, ano);
+    }
+
     private static (string Titulo, string Autor, int Ano) ValidarDados(string? titulo, string? autor, int? ano)
     {
         var tituloValido = Validacao.TextoObrigatorio(titulo, "titulo", "Título", TamanhoMaximoTexto);
